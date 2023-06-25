@@ -1,0 +1,12 @@
+# CRM Details
+CRM_DATABSE = "db"
+CRM_USER = "crm user"
+CRM_PASSWORD = "neo4j password"
+CRM_CONNECTION = "connection"
+
+# JWT details
+JWT_KEY = "jwt token"
+JWT_DATABASE = "jwt db"
+JWT_USER = "jwt user"
+JWT_PASSWORD = "jwt password"
+JWT_CONNECTION = "jwt connection"
