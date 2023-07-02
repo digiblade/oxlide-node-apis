@@ -74,7 +74,12 @@ const login = async (req, res, session) => {
   try {
     // Get user input
     let { email, password } = req.body;
-
+    res.send({
+      email,
+      password,
+      user: process.env.JWT_USER,
+      pass: process.env.JWT_PASSWORD,
+    });
     // Validate user input
     if (!(email && password)) {
       res.status(400).send("All input is required");
