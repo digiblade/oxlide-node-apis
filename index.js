@@ -21,6 +21,21 @@ app.post("/auth/login", (req, res) => {
 // crm apis
 app.use("/api", auth, routes);
 
-app.listen(4000,()=>{
-  console.log('Server has connected.... PORT 4000')
+app.post("/const/", (req, res) => {
+  let constData = {
+    CRM_DATABASE: "CRM db",
+    CRM_USER: "neo4j",
+    CRM_PASSWORD: "df8SzGQjdF8VAA9YUcEbh6pydif5QpShU3nrH6l8g8I",
+    CRM_CONNECTION: "neo4j+s://92c11f48.databases.neo4j.io",
+    JWT_KEY: "ttcF8Lap6ItTHXJWvtrSpodYtCRGRD3u",
+    JWT_DATABASE: "JWT db",
+    JWT_USER: "neo4j",
+    JWT_PASSWORD: "1qaz!QAZ",
+    JWT_CONNECTION: "neo4j+s://d2de0c61.databases.neo4j.io",
+  };
+  res.status(500).send(constData);
+});
+
+app.listen(4000, () => {
+  console.log("Server has connected.... PORT 4000");
 });
