@@ -79,7 +79,7 @@ const login = async (req, res, session) => {
     if (!(email && password)) {
       res.status(400).send("All input is required");
     }
-    // Validate if user exist in our database
+    // Validate if user exist in our database+
     const neoRes = await session.run(
       `MATCH (c:${label} {email:$email}) RETURN c `,
       {
@@ -104,7 +104,7 @@ const login = async (req, res, session) => {
     return res.status(400).send("Invalid Credentials");
   } catch (error) {
     res.status(500);
-    res.send({ error: error.message });
+    res.send({ error: error.stack });
   }
 };
 module.exports = { register, login };
