@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { v4: uuid } = require("uuid");
 const jwt = require("jsonwebtoken");
+const { neo4jResponseToProperty } = require("../Common/Helper/helper");
 const label = "CRMUser";
 const register = async (req, res, session) => {
   try {
@@ -79,41 +80,31 @@ const login = async (req, res, session) => {
       res.status(400).send("All input is required");
     }
     // Validate if user exist in our database
-    const userDetails = await session.run(
-      `MATCH (c:${label} {email:$email}) RETURN {userDetails:c , uuid:c.uuid, email:c.email, password:c.password}`,
+    const neoRes = await session.run(
+      `MATCH (c:${label} {email:$email}) RETURN c `,
       {
         email: email.toLowerCase(),
       }
     );
-
+    let details = neo4jResponseToProperty(neoRes);
     if (
-      userDetails.records.length > 0 &&
-      (await bcrypt.compare(
-        password,
-        userDetails.records[0]["_fields"][0].password
-      ))
+      details.length > 0 &&
+      (await bcrypt.compare(password, details[0].password))
     ) {
-      delete userDetails.records[0]["_fields"][0].password;
-      properties = [];
-      for (record of userDetails.records) {
-        properties.push(record["_fields"][0]);
-      }
-
-      let user = userDetails.records[0]["_fields"][0];
+      let user = details[0]
+      delete user.password;
 
       // Create token
       const token = jwt.sign(user, process.env.JWT_KEY, {
         expiresIn: "8h",
       });
       user.token = token;
-
-      // user
-      return res.status(200).json(user);
+      return res.status(201).json(user);
     }
     return res.status(400).send("Invalid Credentials");
   } catch (error) {
     res.status(500);
-    res.send({ ...error });
+    res.send({ error: error.message });
   }
 };
 module.exports = { register, login };

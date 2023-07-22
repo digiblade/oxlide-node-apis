@@ -1,18 +1,17 @@
-const { Relationship } = require("neo4j-driver");
 const { v4: uuid } = require("uuid");
+const {
+  neo4jResponseToProperty,
+  getDataFromToken,
+} = require("../Common/Helper/helper");
 
 const getCrmData = async (req, res, session) => {
   try {
     let { label, id } = req.params;
-    let filter = id ? `WHERE p.uuid = '${id}' ` : "";
-    let query = `MATCH (p:${label}) ${filter}  RETURN p;`;
+    let filter = id ? `WHERE c.uuid = '${id}' ` : "";
+    let query = `MATCH (c:${label}) ${filter}  RETURN c;`;
     const result = await session.run(query);
-    properties = [];
-    for (record of result.records) {
-      properties.push(record["_fields"][0]);
-    }
     res.status(200);
-    res.send(properties);
+    res.send(neo4jResponseToProperty(result));
   } catch (error) {
     res.status(500);
     res.send({ ...error });
@@ -21,13 +20,12 @@ const getCrmData = async (req, res, session) => {
 const insertCrmData = async (req, res, session) => {
   try {
     let { label } = req.params;
-    let { userDetails } = req.user;
-    let createdBy = userDetails.properties.email;
+    let { email } = getDataFromToken(req, res);
     let body = {
       uuid: uuid(),
       ...req.body.properties,
       createdAt: new Date().getTime(),
-      createdBy,
+      createdBy: email,
     };
     let edges = req.body.edges ? req.body.edges : [];
     let edgeQuerySet = [];
@@ -47,10 +45,7 @@ const insertCrmData = async (req, res, session) => {
       edgeQuerySet.length > 0 ? `WITH p ${edgeQuerySet.join("WITH p ")}` : ""
     }  RETURN p;`;
     const result = await session.run(query, { ...body, ...edgeDataSet });
-    properties = [];
-    for (record of result.records) {
-      properties.push(record["_fields"][0]);
-    }
+    properties = neo4jResponseToProperty(result, "p");
     res.status(201);
     res.send(properties);
   } catch (error) {
@@ -62,11 +57,11 @@ const updateCrmData = async (req, res, session) => {
   try {
     let { label, id } = req.params;
     let { userDetails } = req.user;
-    let modifiedBy = userDetails.properties.email;
+    let { email } = getDataFromToken(req, res);
     let body = {
       ...req.body.properties,
       updatedAt: new Date().getTime(),
-      modifiedBy,
+      modifiedBy: email,
     };
     let edges = req.body.edges ? req.body.edges : [];
     let edgeQuerySet = [];
@@ -95,10 +90,8 @@ const updateCrmData = async (req, res, session) => {
       edgeQuerySet.length > 0 ? `WITH p ${edgeQuerySet.join("WITH p ")}` : ""
     } RETURN p;`;
     const result = await session.run(query, { id, ...body, ...edgeDataSet });
-    properties = [];
-    for (record of result.records) {
-      properties.push(record["_fields"]);
-    }
+    properties = neo4jResponseToProperty(result, "p");
+
     res.status(200);
     res.send(properties);
   } catch (error) {

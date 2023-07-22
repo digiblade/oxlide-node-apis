@@ -21,4 +21,6 @@ app.post("/auth/login", (req, res) => {
 // crm apis
 app.use("/api", auth, routes);
 
-app.listen(4000);
+app.listen(4000,()=>{
+  console.log('Server has connected.... PORT 4000')
+});
