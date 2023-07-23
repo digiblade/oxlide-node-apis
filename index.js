@@ -1,4 +1,5 @@
 let express = require("express");
+let bodyParser = require("body-parser");
 let app = express();
 let routes = require("./Routers/routingEngine");
 let { jwtConnection } = require("./DBConfig/dbConfig");
@@ -6,8 +7,8 @@ let { register, login } = require("./AuthHelpers/auth.helper");
 let auth = require("./Middleware/auth");
 let jwtSession = jwtConnection();
 // middleware for responses
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 // auth apis
 app.post("/auth/register", (req, res) => {
   register(req, res, jwtSession);
