@@ -7,8 +7,8 @@ let { register, login } = require("./AuthHelpers/auth.helper");
 let auth = require("./Middleware/auth");
 let jwtSession = jwtConnection();
 // middleware for responses
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded());
 // auth apis
 app.post("/auth/register", (req, res) => {
   register(req, res, jwtSession);

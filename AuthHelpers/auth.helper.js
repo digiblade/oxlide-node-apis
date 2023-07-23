@@ -99,7 +99,7 @@ const login = async (req, res, session) => {
         expiresIn: "8h",
       });
       user.token = token;
-      return res.status(201).json(user);
+      return res.status(201).send(user);
     }
     return res.status(400).send("Invalid Credentials");
   } catch (error) {
