@@ -6,7 +6,7 @@ let { jwtConnection, mysqlClient } = require("./DBConfig/dbConfig");
 let { register, login, mySqlRegister } = require("./AuthHelpers/auth.helper");
 let auth = require("./Middleware/auth");
 let jwtSession = jwtConnection();
-let mysqlJWTConnection = mysqlClient();
+// let mysqlJWTConnection = mysqlClient();
 // middleware for responses
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
