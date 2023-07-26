@@ -1,5 +1,6 @@
 require("dotenv").config();
 let neo4j = require("neo4j-driver");
+let mysql = require("mysql");
 const crmConnection = () => {
   console.log("Connection initiated for CRM");
   const driver = neo4j.driver(
@@ -21,4 +22,24 @@ const jwtConnection = () => {
   return driver.session();
 };
 
-module.exports = { crmConnection, jwtConnection };
+const mysqlClient = (
+  host = "localhost",
+  port = "3306",
+  database = "jwtdb",
+  user = "root",
+  password = ""
+) => {
+  let connection = mysql.createConnection({
+    host,
+    port,
+    database,
+    user,
+    password,
+  });
+  connection.connect(function (err) {
+    if (err) throw err;
+    console.log("Connected!");
+  });
+  return connection;
+};
+module.exports = { crmConnection, jwtConnection, mysqlClient };

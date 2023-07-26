@@ -71,6 +71,70 @@ const register = async (req, res, session) => {
   }
 };
 
+const mySqlRegister = async (req, res, session) => {
+  try {
+    const { firstName, lastName, email, password } = req.body;
+
+    // Validate user input
+    if (!(email && password && firstName && lastName)) {
+      return res.status(400).send("All input is required");
+    }
+
+    // Check if user already exists
+    const oldUser = await session.query(
+      "SELECT * FROM login ",
+      [email.toLowerCase()]
+    );
+
+    // Validate if user exists in our database
+    if (oldUser._fields.length > 0) {
+      return res.status(409).send("User Already Exists. Please Login");
+    }
+
+    // Encrypt user password
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    let body = {
+      userid: uuid(),
+      username: email.toLowerCase(),
+      useremail: email.toLowerCase(),
+      userpassword: encryptedPassword,
+      activeuser: 1,
+      createdat: new Date().getTime(),
+      updatedat: new Date().getTime(),
+      firstname: firstName,
+      lastname: lastName,
+    };
+
+    let query =
+      "INSERT INTO login (" +
+      Object.keys(body).join(",") +
+      ") VALUES (" +
+      Object.values(body)
+        .map(() => "?")
+        .join(",") +
+      ")";
+
+    // Create user in our database
+    const result = await session.query(query, Object.values(body));
+
+    let user = { userid: body.userid, email };
+
+    // Create token
+    const token = jwt.sign(user, process.env.JWT_KEY, {
+      expiresIn: "8h",
+    });
+
+    // Save user token
+    user.token = token;
+
+    // Return new user
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 const login = async (req, res, session) => {
   try {
     // Get user input
@@ -91,7 +155,7 @@ const login = async (req, res, session) => {
       details.length > 0 &&
       (await bcrypt.compare(password, details[0].password))
     ) {
-      let user = details[0]
+      let user = details[0];
       delete user.password;
 
       // Create token
@@ -107,4 +171,4 @@ const login = async (req, res, session) => {
     res.send({ error: error.stack });
   }
 };
-module.exports = { register, login };
+module.exports = { register, login, mySqlRegister };
