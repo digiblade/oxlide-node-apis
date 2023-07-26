@@ -1,16 +1,16 @@
 require("dotenv").config();
 let neo4j = require("neo4j-driver");
 let mysql = require("mysql");
-const crmConnection = () => {
-  console.log("Connection initiated for CRM");
-  const driver = neo4j.driver(
-    process.env.CRM_CONNECTION,
-    neo4j.auth.basic(process.env.CRM_USER, process.env.CRM_PASSWORD)
-  );
-  console.log("Connection Stablish for CRM");
+// const crmConnection = () => {
+//   console.log("Connection initiated for CRM");
+//   const driver = neo4j.driver(
+//     process.env.CRM_CONNECTION,
+//     neo4j.auth.basic(process.env.CRM_USER, process.env.CRM_PASSWORD)
+//   );
+//   console.log("Connection Stablish for CRM");
 
-  return driver.session();
-};
+//   return driver.session();
+// };
 const jwtConnection = () => {
   console.log("Connection initiated for JWT");
 
@@ -42,4 +42,4 @@ const mysqlClient = (
   });
   return connection;
 };
-module.exports = { crmConnection, jwtConnection, mysqlClient };
+module.exports = { jwtConnection, mysqlClient };
