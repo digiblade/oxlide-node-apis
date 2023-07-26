@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'jwtapi-dev'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_08A6D37336414F8FBA36B9C2875443D1 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_622DA5363C544514B2DBDE0F580EF981 }}
           package: .
