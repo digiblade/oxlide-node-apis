@@ -1,13 +1,13 @@
 let express = require("express");
 let bodyParser = require("body-parser");
+require("dotenv").config();
 let app = express();
 // let routes = require("./Routers/routingEngine");
-let { jwtConnection, mysqlClient } = require("./DBConfig/dbConfig");
-let { register, login, mySqlRegister } = require("./AuthHelpers/auth.helper");
-let auth = require("./Middleware/auth");
-let jwtSession = jwtConnection();
-// let mysqlJWTConnection = mysqlClient();
-// middleware for responses
+let { mysqlClient } = require("./DBConfig/dbConfig");
+let users = require("./Routers/userRouter");
+const { UM_DB_HOST, UM_DB_PORT, UM_DB_DATABASE, UM_DB_USER, UM_DB_PASSWORD } =
+  process.env;
+mysqlClient(UM_DB_HOST, UM_DB_PORT, UM_DB_DATABASE, UM_DB_USER, UM_DB_PASSWORD);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -24,37 +24,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-// auth apis
-app.post("/auth/register", (req, res) => {
-  register(req, res, jwtSession);
-});
-app.post("/auth/mysql/register", (req, res) => {
-  mySqlRegister(req, res, mysqlJWTConnection);
-});
-
-app.post("/auth/login", (req, res) => {
-  login(req, res, jwtSession);
-});
-
-
-
-//mongo apis
-
-
-
-
-
-
-
-
-
-// crm apis
-// app.use("/api", auth, routes);
-
-app.post("/const/", (req, res) => {
-  let constData = { item: { ...process.env } };
-  res.status(500).send(constData);
-});
+app.use("/user", users);
 
 app.listen(4000, () => {
   console.log("Server has connected.... PORT 4000");

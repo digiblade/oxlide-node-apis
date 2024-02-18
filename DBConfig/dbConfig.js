@@ -1,16 +1,7 @@
 require("dotenv").config();
 let neo4j = require("neo4j-driver");
-let mysql = require("mysql");
-// const crmConnection = () => {
-//   console.log("Connection initiated for CRM");
-//   const driver = neo4j.driver(
-//     process.env.CRM_CONNECTION,
-//     neo4j.auth.basic(process.env.CRM_USER, process.env.CRM_PASSWORD)
-//   );
-//   console.log("Connection Stablish for CRM");
-
-//   return driver.session();
-// };
+let mysql = require("mysql2");
+let connection;
 const jwtConnection = () => {
   console.log("Connection initiated for JWT");
 
@@ -29,17 +20,25 @@ const mysqlClient = (
   user = "root",
   password = ""
 ) => {
-  let connection = mysql.createConnection({
-    host,
-    port,
-    database,
-    user,
-    password,
+  connection = mysql.createPool({
+    host: host,
+    user: user,
+    password: password,
+    database: database,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
   });
-  connection.connect(function (err) {
-    if (err) throw err;
-    console.log("Connected!");
+  connection.query("SELECT 1 + 1 AS solution", (error, results, fields) => {
+    if (error) {
+      console.error("Error connecting to MySQL:", error);
+    } else {
+      console.log("Connection to MySQL established successfully!");
+    }
   });
   return connection;
 };
-module.exports = { jwtConnection, mysqlClient };
+const getMySqlConnection = () => {
+  return connection.promise();
+};
+module.exports = { jwtConnection, mysqlClient, getMySqlConnection };
