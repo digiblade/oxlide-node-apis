@@ -5,6 +5,7 @@ let app = express();
 // let routes = require("./Routers/routingEngine");
 let { mysqlClient } = require("./DBConfig/dbConfig");
 let users = require("./Routers/userRouter");
+let inventory = require("./Routers/inventoryRouter");
 const { UM_DB_HOST, UM_DB_PORT, UM_DB_DATABASE, UM_DB_USER, UM_DB_PASSWORD } =
   process.env;
 mysqlClient(UM_DB_HOST, UM_DB_PORT, UM_DB_DATABASE, UM_DB_USER, UM_DB_PASSWORD);
@@ -25,7 +26,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/user", users);
-
+app.use("/inventory", inventory);
 app.listen(4000, () => {
   console.log("Server has connected.... PORT 4000");
 });
