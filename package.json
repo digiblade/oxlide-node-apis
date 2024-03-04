@@ -20,6 +20,7 @@
     "mysql2": "^3.6.5",
     "neo4j-driver": "^5.9.2",
     "nodemon": "^2.0.22",
+    "pdf-puppeteer": "^1.1.11",
     "puppeteer": "^22.3.0",
     "uuid": "^9.0.1"
   }

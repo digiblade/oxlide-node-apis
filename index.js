@@ -1,9 +1,6 @@
 let express = require("express");
 let bodyParser = require("body-parser");
-const path = require("path");
-const fs = require("fs");
-const pdf = require("html-pdf");
-const puppeteer = require("puppeteer");
+const convertHTMLToPDF = require("pdf-puppeteer");
 
 require("dotenv").config();
 let app = express();
@@ -33,34 +30,23 @@ app.use((req, res, next) => {
 app.use("/user", users);
 app.use("/inventory", inventory);
 
-const publicPath = path.join(__dirname, "public"); // Define public folder path
-
-// Ensure public folder exists
-if (!fs.existsSync(publicPath)) {
-  fs.mkdirSync(publicPath);
-}
-
-app.get("/generate-pdf", async (req, res) => {
-  const htmlFile = path.join(__dirname, "template.html"); // Replace with your HTML path
-  const outputPdf = path.join(publicPath, "invoice.pdf");
+app.post("/generate-pdf", async (req, res) => {
+  let {html} = req.body
 
   try {
-    const browser = await puppeteer.launch({ headless: true }); // Launch headless Chrome
-    const page = await browser.newPage();
-    await page.goto(htmlFile, { waitUntil: "networkidle0" }); // Wait for page to load
-
-    // Generate PDF with desired options
-    await page.pdf({ path: outputPdf, format: "A4" });
-
-    await browser.close();
-    res.send("PDF generated successfully!");
+    convertHTMLToPDF(html, (pdf)=>{
+       res.setHeader("Content-Type", "application/pdf");
+        res.send(pdf)
+    },{format:"A4",margin:{
+      left:"10px",
+      right:"10px"
+    }});
   } catch (error) {
     console.error(error);
     res.status(500).send("Error generating PDF");
   }
 });
 
-app.use(express.static(publicPath));
 app.listen(4000, () => {
   console.log("Server has connected.... PORT 4000");
 });
