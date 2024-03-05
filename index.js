@@ -25,22 +25,36 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
     return res.status(200).json({});
   }
+  res.setTimeout(300000, function () {
+    console.log("Request has timed out.");
+    res.send(408);
+  });
   next();
+});
+app.get("/", function (req, res) {
+  res.send("Server is working fine.....");
 });
 app.use("/user", users);
 app.use("/inventory", inventory);
 
 app.post("/generate-pdf", async (req, res) => {
-  let {html} = req.body
+  let { html } = req.body;
 
   try {
-    convertHTMLToPDF(html, (pdf)=>{
-       res.setHeader("Content-Type", "application/pdf");
-        res.send(pdf)
-    },{format:"A4",margin:{
-      left:"10px",
-      right:"10px"
-    }});
+    convertHTMLToPDF(
+      html,
+      (pdf) => {
+        res.setHeader("Content-Type", "application/pdf");
+        res.send(pdf);
+      },
+      {
+        format: "A4",
+        margin: {
+          left: "10px",
+          right: "10px",
+        },
+      }
+    );
   } catch (error) {
     console.error(error);
     res.status(500).send("Error generating PDF");
